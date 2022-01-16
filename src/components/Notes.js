@@ -37,7 +37,8 @@ export default function Notes(props) {
     });
   };
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    e.preventDefault();
     editNote(note.id, note.etitle, note.edescription, note.etag);
     refClose.current.click();
     props.showAlert("Updated Successfully !!", "success");
@@ -45,6 +46,10 @@ export default function Notes(props) {
 
   const onChange = (e) => {
     setNote({ ...note, [e.target.name]: e.target.value });
+  };
+
+  const onBlur = (e) => {
+    setNote({ ...note, [e.target.name]: e.target.value.trim() });
   };
 
   return (
@@ -81,7 +86,7 @@ export default function Notes(props) {
               ></button>
             </div>
             <div className="modal-body">
-              <form className="my-3">
+              <form className="my-3" onSubmit={handleClick}>
                 <div className="mb-3">
                   <label htmlFor="title" className="form-label">
                     Title
@@ -94,24 +99,38 @@ export default function Notes(props) {
                     value={note.etitle}
                     aria-describedby="emailHelp"
                     onChange={onChange}
+                    onBlur={onBlur}
                     minLength={3}
+                    maxLength={50}
                     required
                   />
+
+                  <div className="d-flex justify-content-between form-text">
+                    <div>Minimum Length: 3</div>
+                    <div>Maximum Length: 50</div>
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="description" className="form-label">
                     Description
                   </label>
-                  <input
+                  <textarea
                     type="text"
                     className="form-control"
                     id="edescription"
                     name="edescription"
                     value={note.edescription}
                     onChange={onChange}
+                    onBlur={onBlur}
                     minLength={5}
+                    maxLength={500}
                     required
                   />
+
+                  <div className="d-flex justify-content-between form-text">
+                    <div>Minimum Length: 5</div>
+                    <div>Maximum Length: 500</div>
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="tag" className="form-label">
@@ -124,29 +143,31 @@ export default function Notes(props) {
                     name="etag"
                     value={note.etag}
                     onChange={onChange}
+                    onBlur={onBlur}
+                    maxLength={15}
                   />
                 </div>
+
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                    ref={refClose}
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={
+                      note.etitle.length < 3 || note.edescription.length < 5
+                    }
+                  >
+                    Update Note
+                  </button>
+                </div>
               </form>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-                ref={refClose}
-              >
-                Close
-              </button>
-              <button
-                onClick={handleClick}
-                type="button"
-                className="btn btn-primary"
-                disabled={
-                  note.etitle.length < 3 || note.edescription.length < 5
-                }
-              >
-                Update Note
-              </button>
             </div>
           </div>
         </div>
@@ -154,7 +175,9 @@ export default function Notes(props) {
 
       <div className="container row my-2">
         <div className="row mx-3">
-          {notes.length === 0 && <h6 className="text-center">No Notes to Display !!</h6>}
+          {notes.length === 0 && (
+            <h6 className="text-center">No Notes to Display !!</h6>
+          )}
 
           {notes.map((note, i) => {
             return (
