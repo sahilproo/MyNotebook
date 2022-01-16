@@ -1,11 +1,7 @@
 import "./App.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import About from "./components/About";
 import NoteState from "./context/notes/NoteState";
@@ -15,6 +11,16 @@ import Signup from "./components/Signup";
 
 export default function App() {
   const [alert, setAlert] = useState(null);
+
+  useEffect(() => {
+    window.history.pushState(null, null, document.URL);
+    window.addEventListener("popstate", function (event) {
+      if (localStorage.getItem("token")) {
+        localStorage.removeItem("token");
+        showAlert("Logged out successfully !!", "success");
+      }
+    });
+  }, []);
 
   const showAlert = (message, type) => {
     setAlert({
